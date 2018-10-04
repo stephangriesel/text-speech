@@ -1,80 +1,96 @@
 // Var for SpeechAPI, more info on API can be found here: https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis
-const speech = window.speechSynthesis;
+const synth = window.speechSynthesis;
 
 // DOM elements
-const textForm = document.querySelector('form');
-const textInput = document.querySelector('#text-input');
-const rateValue = document.querySelector('#rate-value');
-const rate = document.querySelector('#rate');
-const pitch = document.querySelector('#pitch');
-const pitchValue = document.querySelector('#pitch-value');
-const voiceSelect = document.querySelector('#voice-select');
+const textForm = document.querySelector("form");
+const textInput = document.querySelector("#text-input");
+const rateValue = document.querySelector("#rate-value");
+const rate = document.querySelector("#rate");
+const pitch = document.querySelector("#pitch");
+const pitchValue = document.querySelector("#pitch-value");
+const voiceSelect = document.querySelector("#voice-select");
 
 // Initialize voices array
 let voices = [];
 
 const getVoices = () => {
-    voices = speech.getVoices();
-    console.log("Get Voices!")
-    console.log(voices);
+  voices = synth.getVoices();
+  console.log("Get Voices!");
+  console.log(voices);
 
-    // For each voices (aka loop)
-    voices.forEach(voice => {
-        // Create option element
-        const option = document.createElement('option');
-        // Complete option with voice and lang
-        option.textContent = voice.name + '(' + voice.lang +')';
-        // Set attributes
-        option.setAttribute('data-lang', voice.lang);
-        option.setAttribute('data-name', voice.name);
-        voiceSelect.appendChild(option);
-    });
-
+  // For each voices (aka loop)
+  voices.forEach(voice => {
+    // Create option element
+    const option = document.createElement("option");
+    // Complete option with voice and lang
+    option.textContent = voice.name + "(" + voice.lang + ")";
+    // Set attributes
+    option.setAttribute("data-lang", voice.lang);
+    option.setAttribute("data-name", voice.name);
+    voiceSelect.appendChild(option);
+  });
 };
 
 getVoices();
-if(speech.onvoiceschanged !== undefined) {
-    speech.onvoiceschanged = getVoices;
+if (synth.onvoiceschanged !== undefined) {
+  synth.onvoiceschanged = getVoices;
 }
 
 // Add speak function
-const talktome = () => {
-    // Confirm if speaking
-    if(speech.speaking) {
-        console.error('I am here speaking already..');
-        return;
-    }
-    if(textInput.value !== ''){
-        
-        // Get text
-        const speakText = new SpeechSynthesisUtterance(textInput.value);
-        
-        // End speak
-        speakText.onend = e => {
-            console.log('Finished talking to you...')
-        }
+const speak = () => {
+  // Confirm if speaking
+  if (synth.speaking) {
+    console.error("I am here speaking already..");
+    return;
+  }
+  if (textInput.value !== "") {
+    // Get text
+    const speakText = new SpeechSynthesisUtterance(textInput.value);
 
-        // Error
-        speakText.onerror = e => {
-            ('ERROR ERROR!!');
-        }
+    // End speak
+    speakText.onend = e => {
+      console.log("Finished talking to you...");
+    };
 
-        //  Voice 
-        const voiceChoice = voiceSelect.selectedOptions[0].getAttribute('data-name');
+    // Error
+    speakText.onerror = e => {
+      ("ERROR ERROR!!");
+    };
 
-        // Voice loop
-        voices.forEach(voice => {
-            if(voice.name === voiceChoice) {
-                speakText.voice = voice;
-            }
-        });
+    //  Voice
+    const selectedVoice = voiceSelect.selectedOptions[0].getAttribute(
+      "data-name"
+    );
 
-        // Pitch & Rate
-        speakText.rate = rate.value;
-        speakText.pitch = pitch.value;
-        // Say it
-        speech.speak(speakText);
+    // Voice loop
+    voices.forEach(voice => {
+      if (voice.name === selectedVoice) {
+        speakText.voice = voice;
+      }
+    });
 
-    }
+    // Pitch & Rate
+    speakText.rate = rate.value;
+    speakText.pitch = pitch.value;
+    // Say it
+    synth.speak(speakText);
+  }
 };
 
+// Event Listener
+
+// Form submit
+textForm.addEventListener("submit", e => {
+  e.preventDefault();
+  speak();
+  textInput.blur();
+});
+
+// Value change for rate
+rate.addEventListener("change", e => (rateValue.textContent = rate.value));
+
+// Value change for pitch
+pitch.addEventListener("change", e => (pitchValue.textContent = pitch.value));
+
+// Voice select change
+voiceSelect.addEventListener("change", e => speak());
