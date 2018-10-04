@@ -36,3 +36,45 @@ getVoices();
 if(speech.onvoiceschanged !== undefined) {
     speech.onvoiceschanged = getVoices;
 }
+
+// Add speak function
+const talktome = () => {
+    // Confirm if speaking
+    if(speech.speaking) {
+        console.error('I am here speaking already..');
+        return;
+    }
+    if(textInput.value !== ''){
+        
+        // Get text
+        const speakText = new SpeechSynthesisUtterance(textInput.value);
+        
+        // End speak
+        speakText.onend = e => {
+            console.log('Finished talking to you...')
+        }
+
+        // Error
+        speakText.onerror = e => {
+            ('ERROR ERROR!!');
+        }
+
+        //  Voice 
+        const voiceChoice = voiceSelect.selectedOptions[0].getAttribute('data-name');
+
+        // Voice loop
+        voices.forEach(voice => {
+            if(voice.name === voiceChoice) {
+                speakText.voice = voice;
+            }
+        });
+
+        // Pitch & Rate
+        speakText.rate = rate.value;
+        speakText.pitch = pitch.value;
+        // Say it
+        speech.speak(speakText);
+
+    }
+};
+
