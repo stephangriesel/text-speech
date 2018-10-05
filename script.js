@@ -49,7 +49,7 @@ const speak = () => {
     body.style.background = "#FFF url(6.gif)";
     body.style.backgroundRepeat = "repeat-x";
     body.style.backgroundSize = "100% 100%";
-    body.style.backgroundPosition = "bottom";
+    body.style.backgroundPosition = "500px 200px";
 
     // Get text
     const speakText = new SpeechSynthesisUtterance(textInput.value);
